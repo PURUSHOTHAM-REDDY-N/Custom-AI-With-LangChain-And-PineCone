@@ -15,7 +15,7 @@ import { queryPineconeVectorStoreAndQueryLLM } from "./3-queryPineconeAndQueryGP
 // 6. Load environment variables
 dotenv.config();
 // 7. Set up variables for the filename, question, and index settings
-const question = "Who is ram?";
+const question = "I am 28 years old. I drank water in the morning. when should should i drink next?";
 const indexName = "your-pinecone-index-name";
 const vectorDimension = 1536;
 // 8. Run the main async function
