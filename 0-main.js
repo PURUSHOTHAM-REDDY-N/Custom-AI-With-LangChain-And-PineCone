@@ -12,8 +12,19 @@ import * as dotenv from "dotenv";
 import { createPineconeIndex } from "./1-createPineconeIndex.js";
 import { updatePinecone } from "./2-updatePinecone.js";
 import { queryPineconeVectorStoreAndQueryLLM } from "./3-queryPineconeAndQueryGPT.js";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
 // 6. Load environment variables
 dotenv.config();
+
+//express server
+const express = require('express')
+const app = express()
+const port = 1337
+app.use(express.json())
+app.use(require('cors')())
+
 // 7. Set up variables for the filename, question, and index settings
 const question = "I am 28 years old. I drank water in the morning. when should should i drink next?";
 const indexName = "your-pinecone-index-name";
@@ -37,5 +48,29 @@ const vectorDimension = 1536;
 // 12. Update Pinecone vector store with document embeddings
   await updatePinecone(client, indexName, docs);
 // 13. Query Pinecone vector store and GPT model for an answer
-  await queryPineconeVectorStoreAndQueryLLM(client, indexName, question);
+  
 })();
+
+
+//route
+
+app.get('/',(req,res)=>{
+  res.send("hello")
+})
+
+app.post('/api', async (req,res)=>{
+    const {prompt} = req.body
+    const client = new PineconeClient();
+    await client.init({
+    apiKey: process.env.PINECONE_API_KEY,
+    environment: process.env.PINECONE_ENVIRONMENT,
+  });
+    const indexName = "your-pinecone-index-name";
+    const result = await queryPineconeVectorStoreAndQueryLLM(client, indexName, prompt);
+    res.json({
+      "message":result
+    })
+})
+
+
+app.listen(port,()=>console.log(`App is running on ${port}`))
