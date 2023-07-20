@@ -64,10 +64,15 @@ const client = new PineconeClient();
 
 //route
 
-app.post('/news', async (req, res) => {
-  const {prompt} = req.body
 
-  fs.writeFile(filePath, prompt, (err) => {
+app.post('/news', async (req, res) => {
+  const strings = req.body
+
+  if (!Array.isArray(strings)) {
+    return res.status(400).json({ error: 'Invalid data. Expected an array of strings.' });
+  }
+
+  fs.writeFile(filePath, strings, (err) => {
     if (err) {
       console.error('Error clearing file:', err);
       return;
