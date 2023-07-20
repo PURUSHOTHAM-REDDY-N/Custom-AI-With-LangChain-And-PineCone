@@ -64,6 +64,20 @@ const client = new PineconeClient();
 
 //route
 
+app.post('/strings', (req, res) => {
+  const strings = req.body;
+
+  if (!Array.isArray(strings)) {
+    return res.status(400).json({ error: 'Invalid data. Expected an array of strings.' });
+  }
+
+  // Perform any desired operations with the array of strings
+  console.log('Received strings:', strings);
+
+  // Send a response indicating success
+  res.json({ message: 'Strings received successfully.' });
+});
+
 
 app.post('/news', async (req, res) => {
   const strings = req.body
@@ -72,7 +86,7 @@ app.post('/news', async (req, res) => {
     return res.status(400).json({ error: 'Invalid data. Expected an array of strings.' });
   }
 
-  fs.writeFile(filePath, strings, (err) => {
+  fs.writeFile(filePath, strings+" ", (err) => {
     if (err) {
       console.error('Error clearing file:', err);
       return;
