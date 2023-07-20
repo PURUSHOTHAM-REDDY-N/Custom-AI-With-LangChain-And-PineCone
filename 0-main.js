@@ -1,4 +1,4 @@
-// 1. Initialize a new project with: npm init -y, and create an 4 js files .env file 
+// 1. Initialize a new project with: npm init -y, and create an 4 js files .env file
 // 2. npm i "@pinecone-database/pinecone@^0.0.10" dotenv@^16.0.3 langchain@^0.0.73
 // 3. Obtain API key from OpenAI (https://platform.openai.com/account/api-keys)
 // 4. Obtain API key from Pinecone (https://app.pinecone.io/)
@@ -13,7 +13,11 @@ import { createPineconeIndex } from "./1-createPineconeIndex.js";
 import { updatePinecone } from "./2-updatePinecone.js";
 import { queryPineconeVectorStoreAndQueryLLM } from "./3-queryPineconeAndQueryGPT.js";
 import { createRequire } from "module";
+import fs from "fs";
 const require = createRequire(import.meta.url);
+
+const filePath = 'documents/datafile.txt';
+
 
 // 6. Load environment variables
 dotenv.config();
@@ -30,29 +34,60 @@ const question = "I am 28 years old. I drank water in the morning. when should s
 const indexName = "your-pinecone-index-name";
 const vectorDimension = 1536;
 // 8. Run the main async function
+const client = new PineconeClient();
+
 (async () => {
-// 9. Initialize Pinecone client with API key and environment
-  const client = new PineconeClient();
-  await client.init({
-    apiKey: process.env.PINECONE_API_KEY,
-    environment: process.env.PINECONE_ENVIRONMENT,
+  try {
+    // 9. Initialize Pinecone client with API key and environment
+    await client.init({
+      apiKey: process.env.PINECONE_API_KEY,
+      environment: process.env.PINECONE_ENVIRONMENT,
+    });
+  // 10. Check if Pinecone index exists and create if necessary
+    await createPineconeIndex(client, indexName, vectorDimension);
+  // 11. Set up DirectoryLoader to load documents from the ./documents directory
+    const loader = new DirectoryLoader("./documents", {
+      ".txt": (path) => new TextLoader(path),
+      ".pdf": (path) => new PDFLoader(path),
+    });
+    const docs = await loader.load();
+  // 12. Update Pinecone vector store with document embeddings
+    await updatePinecone(client, indexName, docs);
+  // 13. Query Pinecone vector store and GPT model for an answer
+    await queryPineconeVectorStoreAndQueryLLM(client, indexName, question);
+  }catch (error) {
+    console.error("An error occurred:", error);
+  }
+
+  })();
+
+
+//route
+
+app.post('/news', async (req, res) => {
+  const {prompt} = req.body
+
+  fs.writeFile(filePath, prompt, (err) => {
+    if (err) {
+      console.error('Error clearing file:', err);
+      return;
+    }
+    console.log('File cleared successfully!');
   });
-// 10. Check if Pinecone index exists and create if necessary
-  await createPineconeIndex(client, indexName, vectorDimension);
-// 11. Set up DirectoryLoader to load documents from the ./documents directory
   const loader = new DirectoryLoader("./documents", {
     ".txt": (path) => new TextLoader(path),
     ".pdf": (path) => new PDFLoader(path),
   });
   const docs = await loader.load();
-// 12. Update Pinecone vector store with document embeddings
+
+
   await updatePinecone(client, indexName, docs);
-// 13. Query Pinecone vector store and GPT model for an answer
-  
-})();
 
 
-//route
+  res.send("ok")
+
+
+});
 
 app.get('/',(req,res)=>{
   res.send("hello")
