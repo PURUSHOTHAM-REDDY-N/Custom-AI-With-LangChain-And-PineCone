@@ -103,7 +103,7 @@ app.post('/news', async (req, res) => {
   await updatePinecone(client, indexName, docs);
 
 
-  res.send("ok")
+  res.json({"message":"ok"});
 
 
 });
