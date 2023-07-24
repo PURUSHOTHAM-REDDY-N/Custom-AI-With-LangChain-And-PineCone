@@ -1,1 +1,1 @@
-string1,string2 
+barney is crazy,ted is honest 

@@ -7,16 +7,20 @@ export const updatePinecone = async (client, indexName, docs) => {
 // 3. Retrieve Pinecone index
   const index = client.Index(indexName);
 // 4. Log the retrieved index name
+  console.log(docs)
   console.log(`Pinecone index retrieved: ${indexName}`);
+
 // 5. Process each document in the docs array
   for (const doc of docs) {
-    console.log(`Processing document: ${doc.metadata.source}`);
-    const txtPath = doc.metadata.source;
-    const text = doc.pageContent;
+    console.log(doc)
+    console.log(`Processing document`);
+    const txtPath = doc.id;
+    const text = doc.description;
 // 6. Create RecursiveCharacterTextSplitter instance
     const textSplitter = new RecursiveCharacterTextSplitter({
       chunkSize: 1000,
     });
+
     console.log("Splitting text into chunks...");
 // 7. Split text into chunks (documents)
     const chunks = await textSplitter.createDocuments([text]);
@@ -38,7 +42,8 @@ export const updatePinecone = async (client, indexName, docs) => {
     for (let idx = 0; idx < chunks.length; idx++) {
       const chunk = chunks[idx];
       const vector = {
-        id: `${txtPath}_${idx}`,
+        id: txtPath,
+        // id: `${txtPath}_${idx}`,
         values: embeddingsArrays[idx],
         metadata: {
           ...chunk.metadata,

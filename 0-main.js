@@ -52,9 +52,9 @@ const client = new PineconeClient();
     });
     const docs = await loader.load();
   // 12. Update Pinecone vector store with document embeddings
-    await updatePinecone(client, indexName, docs);
+  //   await updatePinecone(client, indexName, docs);
   // 13. Query Pinecone vector store and GPT model for an answer
-    await queryPineconeVectorStoreAndQueryLLM(client, indexName, question);
+  //   await queryPineconeVectorStoreAndQueryLLM(client, indexName, question);
   }catch (error) {
     console.error("An error occurred:", error);
   }
@@ -86,18 +86,12 @@ app.post('/news', async (req, res) => {
     return res.status(400).json({ error: 'Invalid data. Expected an array of strings.' });
   }
 
-  fs.writeFile(filePath, strings+" ", (err) => {
-    if (err) {
-      console.error('Error clearing file:', err);
-      return;
-    }
-    console.log('File cleared successfully!');
-  });
-  const loader = new DirectoryLoader("./documents", {
-    ".txt": (path) => new TextLoader(path),
-    ".pdf": (path) => new PDFLoader(path),
-  });
-  const docs = await loader.load();
+  // const docs = [
+  //   {id:123,title:"how i met your mother",description:"barney is crazy",createdAt:"Mon Jul 24 2023 12:36:28 GMT+0530"},
+  //   {id:456,title: "ted is honest",description:"description",createdAt:"Mon Jul 24 2023 12:36:28 GMT+0530"}
+  // ];
+
+  const docs =strings
 
 
   await updatePinecone(client, indexName, docs);
