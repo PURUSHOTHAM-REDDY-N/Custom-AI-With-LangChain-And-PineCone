@@ -14,7 +14,7 @@ export const queryPineconeVectorStoreAndQueryLLM = async (
 // 4. Retrieve the Pinecone index
   const index = client.Index(indexName);
 // 5. Create query embedding
-  const queryEmbedding = await new OpenAIEmbeddings().embedQuery(question);
+  const queryEmbedding = await new OpenAIEmbeddings().embedQuery(question.query);
 // 6. Query Pinecone index and return top 10 matches
   let queryResponse = await index.query({
     queryRequest: {
@@ -39,7 +39,7 @@ export const queryPineconeVectorStoreAndQueryLLM = async (
 // 11. Execute the chain with input documents and question
     const result = await chain.call({
       input_documents: [new Document({ pageContent: concatenatedPageContent })],
-      question: question,
+      question: question.question,
     });
 // 12. Log the answer
     console.log(`Answer: ${result.text}`);

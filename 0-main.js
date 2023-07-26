@@ -113,8 +113,9 @@ app.post('/api', async (req,res)=>{
     apiKey: process.env.PINECONE_API_KEY,
     environment: process.env.PINECONE_ENVIRONMENT,
   });
+    console.log(req.body.question)
     const indexName = "your-pinecone-index-name";
-    const result = await queryPineconeVectorStoreAndQueryLLM(client, indexName, prompt);
+    const result = await queryPineconeVectorStoreAndQueryLLM(client, indexName, req.body);
     res.json({
       "message":result
     })
