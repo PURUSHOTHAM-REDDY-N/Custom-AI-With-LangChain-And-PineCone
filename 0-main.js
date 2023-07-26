@@ -123,3 +123,5 @@ app.post('/api', async (req,res)=>{
 
 
 app.listen(port,()=>console.log(`App is running on ${port}`))
+
+console.log('Test log');
